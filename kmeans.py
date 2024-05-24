@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class KMeans:
     def __init__(self, data, k, init_centroids=None, max_iters=100):
         self.data = data
@@ -32,6 +31,18 @@ class KMeans:
             new_centroids.append(cluster_points.mean(axis=0))
         return np.array(new_centroids)
 
+    def calculate_average_distances(self, centroids, clusters):
+        average_distances = []
+        for i in range(self.k):
+            cluster_points = self.data[clusters == i]
+            if len(cluster_points) == 0:
+                average_distances.append(0)
+                continue
+            distances = [self.euclidean_distance(point, centroids[i]) for point in cluster_points]
+            average_distance = np.mean(distances)
+            average_distances.append(average_distance)
+        return np.array(average_distances)
+
     def kmeans(self):
         centroids = self.initialize_centroids()
         for _ in range(self.max_iters):
@@ -40,4 +51,5 @@ class KMeans:
             if np.all(centroids == new_centroids):
                 break
             centroids = new_centroids
-        return centroids, clusters
+        average_distances = self.calculate_average_distances(centroids, clusters)
+        return centroids, clusters, average_distances
